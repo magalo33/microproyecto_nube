@@ -1,0 +1,249 @@
+vagrant ssh ubuntuvm01
+vagrant ssh ubuntuvm02
+vagrant ssh ubuntuvm03
+sudo snap install lxd
+sudo gpasswd -a vagrant lxd
+logout
+vagrant ssh ubuntuvm01
+vagrant ssh ubuntuvm02
+vagrant ssh ubuntuvm03
+lxd init
+
+Would you like to use LXD clustering? (yes/no) [default=no]: yes
+What name should be used to identify this node in the cluster? [default=ubuntuvm01]: 
+What IP address or DNS name should be used to reach this node? [default=10.0.2.15]: 192.168.56.101
+Are you joining an existing cluster? (yes/no) [default=no]: 
+Setup password authentication on the cluster? (yes/no) [default=yes]: 
+Trust password for new clients: 
+Again: 
+Do you want to configure a new local storage pool? (yes/no) [default=yes]: 
+Name of the storage backend to use (btrfs, dir, lvm) [default=btrfs]: dir
+Do you want to configure a new remote storage pool? (yes/no) [default=no]: 
+Would you like to connect to a MAAS server? (yes/no) [default=no]: 
+Would you like to configure LXD to use an existing bridge or host interface? (yes/no) [default=no]: 
+Would you like to create a new Fan overlay network? (yes/no) [default=yes]: 
+What subnet should be used as the Fan underlay? [default=auto]: 
+Would you like stale cached images to be updated automatically? (yes/no) [default=yes] 
+Would you like a YAML "lxd init" preseed to be printed? (yes/no) [default=no]: 
+
+lxc list
+
+
+sudo lxd init  --ojo para la segunda maquina usar con sudo
+vagrant@ubuntuvm02:~$ sudo lxd init
+Would you like to use LXD clustering? (yes/no) [default=no]: yes
+What name should be used to identify this node in the cluster? [default=ubuntuvm02]: 
+What IP address or DNS name should be used to reach this node? [default=10.0.2.15]: 192.168.56.102             
+Are you joining an existing cluster? (yes/no) [default=no]: yes
+IP address or FQDN of an existing cluster node: 192.168.56.101
+Cluster fingerprint: c45a981b6511f965399fa2a4be3ca01493bb9cc80a5e4ba8e71ee776b9709eaa
+You can validate this fingerpring by running "lxc info" locally on an existing node.
+Is this the correct fingerprint? (yes/no) [default=no]: yes
+Cluster trust password: 
+All existing data is lost when joining a cluster, continue? (yes/no) [default=no] yes
+Choose the local disk or dataset for storage pool "local" (empty for loop disk): 
+Would you like a YAML "lxd init" preseed to be printed? (yes/no) [default=no]: 
+
+
+
+
+
+sudo systemctl status lxd
+
+
+vagrant@ubuntuvm03:~$ sudo lxd init
+Would you like to use LXD clustering? (yes/no) [default=no]: yes
+What name should be used to identify this node in the cluster? [default=ubuntuvm03]: 
+What IP address or DNS name should be used to reach this node? [default=10.0.2.15]: 192.168.56.103
+Are you joining an existing cluster? (yes/no) [default=no]: yes
+IP address or FQDN of an existing cluster node: 192.168.56.101
+Cluster fingerprint: c45a981b6511f965399fa2a4be3ca01493bb9cc80a5e4ba8e71ee776b9709eaa
+You can validate this fingerpring by running "lxc info" locally on an existing node.
+Is this the correct fingerprint? (yes/no) [default=no]: yes
+Cluster trust password: 
+All existing data is lost when joining a cluster, continue? (yes/no) [default=no] yes
+Choose the local disk or dataset for storage pool "local" (empty for loop disk): 
+Would you like a YAML "lxd init" preseed to be printed? (yes/no) [default=no]: 
+vagrant@ubuntuvm03:~$ lxc cluster list
+To start your first container, try: lxc launch ubuntu:18.04
+
++------------+-----------------------------+----------+--------+-------------------+
+|    NAME    |             URL             | DATABASE | STATE  |      MESSAGE      |
++------------+-----------------------------+----------+--------+-------------------+
+| ubuntuvm01 | https://192.168.56.101:8443 | YES      | ONLINE | fully operational |
++------------+-----------------------------+----------+--------+-------------------+
+| ubuntuvm02 | https://192.168.56.102:8443 | YES      | ONLINE | fully operational |
++------------+-----------------------------+----------+--------+-------------------+
+| ubuntuvm03 | https://192.168.56.103:8443 | YES      | ONLINE | fully operational |
++------------+-----------------------------+----------+--------+-------------------+
+vagrant@ubuntuvm03:~$ 
+
+
+
+vagrant@ubuntuvm03:~$ lxc cluster show ubuntuvm02
+server_name: ubuntuvm02
+url: https://192.168.56.102:8443
+database: true
+status: Online
+message: fully operational
+vagrant@ubuntuvm03:~$ lxc cluster show ubuntuvm01
+server_name: ubuntuvm01
+url: https://192.168.56.101:8443
+database: true
+status: Online
+message: fully operational
+vagrant@ubuntuvm03:~$ lxc cluster show ubuntuvm03
+server_name: ubuntuvm03
+url: https://192.168.56.103:8443
+database: true
+status: Online
+message: fully operational
+vagrant@ubuntuvm03:~$ 
+
+
+
+
+lxc image list
+
+
+vagrant@ubuntuvm01:~$ lxc init ubuntu:18.04 myubuntu1
+Creating myubuntu1
+
+lxc start myubuntu1
+vagrant@ubuntuvm01:~$ lxc list
++-----------+---------+--------------------+------+------------+-----------+------------+
+|   NAME    |  STATE  |        IPV4        | IPV6 |    TYPE    | SNAPSHOTS |  LOCATION  |
++-----------+---------+--------------------+------+------------+-----------+------------+
+| myubuntu1 | RUNNING | 240.15.0.22 (eth0) |      | PERSISTENT | 0         | ubuntuvm01 |
++-----------+---------+--------------------+------+------------+-----------+------------+
+
+agrant@ubuntuvm01:~$ lxc image list
++-------+--------------+--------+---------------------------------------------+--------+----------+-----------------------------+
+| ALIAS | FINGERPRINT  | PUBLIC |                 DESCRIPTION                 |  ARCH  |   SIZE   |         UPLOAD DATE         |
++-------+--------------+--------+---------------------------------------------+--------+----------+-----------------------------+
+|       | c533845b5db1 | no     | ubuntu 18.04 LTS amd64 (release) (20230607) | x86_64 | 215.55MB | Apr 4, 2025 at 2:11am (UTC) |
++-------+--------------+--------+---------------------------------------------+--------+----------+-----------------------------+
+
+
+lxc init ubuntu:18.04 myubuntu2
+
+
+vagrant@ubuntuvm03:~$ lxc list
++-----------+---------+---------------------+------+------------+-----------+------------+
+|   NAME    |  STATE  |        IPV4         | IPV6 |    TYPE    | SNAPSHOTS |  LOCATION  |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu1 | RUNNING | 240.15.0.22 (eth0)  |      | PERSISTENT | 0         | ubuntuvm01 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu2 | RUNNING | 240.15.0.230 (eth0) |      | PERSISTENT | 0         | ubuntuvm02 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu3 | RUNNING | 240.15.0.238 (eth0) |      | PERSISTENT | 0         | ubuntuvm03 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu4 | RUNNING | 240.15.0.61 (eth0)  |      | PERSISTENT | 0         | ubuntuvm01 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+
+
+vagrant@ubuntuvm03:~$ lxc exec myubuntu1 bash
+root@myubuntu1:~# 
+
+
+vagrant@ubuntuvm03:~$ lxc list
++-----------+---------+---------------------+------+------------+-----------+------------+
+|   NAME    |  STATE  |        IPV4         | IPV6 |    TYPE    | SNAPSHOTS |  LOCATION  |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu1 | RUNNING | 240.15.0.22 (eth0)  |      | PERSISTENT | 0         | ubuntuvm01 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu2 | RUNNING | 240.15.0.230 (eth0) |      | PERSISTENT | 0         | ubuntuvm02 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu3 | RUNNING | 240.15.0.238 (eth0) |      | PERSISTENT | 0         | ubuntuvm03 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu4 | RUNNING | 240.15.0.61 (eth0)  |      | PERSISTENT | 0         | ubuntuvm01 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+vagrant@ubuntuvm03:~$ 
+
+
+
+vagrant@ubuntuvm03:~$ lxc list
++-----------+---------+---------------------+------+------------+-----------+------------+
+|   NAME    |  STATE  |        IPV4         | IPV6 |    TYPE    | SNAPSHOTS |  LOCATION  |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu1 | RUNNING | 240.15.0.22 (eth0)  |      | PERSISTENT | 0         | ubuntuvm01 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu2 | RUNNING | 240.15.0.230 (eth0) |      | PERSISTENT | 0         | ubuntuvm02 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu3 | RUNNING | 240.15.0.238 (eth0) |      | PERSISTENT | 0         | ubuntuvm03 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+| myubuntu4 | RUNNING | 240.15.0.61 (eth0)  |      | PERSISTENT | 0         | ubuntuvm01 |
++-----------+---------+---------------------+------+------------+-----------+------------+
+vagrant@ubuntuvm03:~$ lxc network list
++---------+----------+---------+-------------+---------+---------+
+|  NAME   |   TYPE   | MANAGED | DESCRIPTION | USED BY |  STATE  |
++---------+----------+---------+-------------+---------+---------+
+| enp0s3  | physical | NO      |             | 0       |         |
++---------+----------+---------+-------------+---------+---------+
+| enp0s8  | physical | NO      |             | 0       |         |
++---------+----------+---------+-------------+---------+---------+
+| lxdfan0 | bridge   | YES     |             | 4       | CREATED |
++---------+----------+---------+-------------+---------+---------+
+vagrant@ubuntuvm03:~$ 
+
+
+
+vagrant@ubuntuvm03:~$ lxc network show lxdfan0
+config:
+  bridge.mode: fan
+  fan.underlay_subnet: 10.0.2.0/24
+description: ""
+name: lxdfan0
+type: bridge
+used_by:
+- /1.0/containers/myubuntu1
+- /1.0/containers/myubuntu2
+- /1.0/containers/myubuntu3
+- /1.0/containers/myubuntu4
+managed: true
+status: Created
+locations:
+- ubuntuvm01
+- ubuntuvm02
+- ubuntuvm03
+vagrant@ubuntuvm03:~$ 
+
+
+vagrant@ubuntuvm03:~$ ip a s
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 02:3b:7b:b7:3b:2d brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic enp0s3
+       valid_lft 82498sec preferred_lft 82498sec
+    inet6 fd00::3b:7bff:feb7:3b2d/64 scope global dynamic mngtmpaddr noprefixroute 
+       valid_lft 86381sec preferred_lft 14381sec
+    inet6 fe80::3b:7bff:feb7:3b2d/64 scope link 
+       valid_lft forever preferred_lft forever
+3: enp0s8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:7b:df:30 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.56.103/24 brd 192.168.56.255 scope global enp0s8
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a00:27ff:fe7b:df30/64 scope link 
+       valid_lft forever preferred_lft forever
+4: lxdfan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default qlen 1000
+    link/ether 26:67:ca:29:ac:b8 brd ff:ff:ff:ff:ff:ff
+    inet 240.15.0.1/8 scope global lxdfan0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::2467:caff:fe29:acb8/64 scope link 
+       valid_lft forever preferred_lft forever
+5: lxdfan0-mtu: <BROADCAST,NOARP> mtu 1450 qdisc noop master lxdfan0 state DOWN group default qlen 1000
+    link/ether 26:67:ca:29:ac:b8 brd ff:ff:ff:ff:ff:ff
+6: lxdfan0-fan: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master lxdfan0 state UNKNOWN group default qlen 1000
+    link/ether fe:25:99:63:d4:33 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::fc25:99ff:fe63:d433/64 scope link 
+       valid_lft forever preferred_lft forever
+8: vethA6PCBC@if7: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master lxdfan0 state UP group default qlen 1000
+    link/ether fe:44:e6:b2:48:d5 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet6 fe80::fc44:e6ff:feb2:48d5/64 scope link 
+       valid_lft forever preferred_lft forever
+vagrant@ubuntuvm03:~$ 
